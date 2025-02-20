@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { IconCamper, IconChevronDown } from "@tabler/icons-react";
+import { IconFileText, IconChevronDown } from "@tabler/icons-react";
 import ThemeToggler from "./ThemeToggler";
 
 const Header = () => {
@@ -9,17 +9,17 @@ const Header = () => {
       <div className="navbar px-10 py-2 bg-base-300">
         <div className="navbar-start">
           <Link href="/" className="space-x-3 flex items-center">
-            <IconCamper size={50} className="text-primary" />
+            <IconFileText size={50} className="text-primary" />
             <div className="flex flex-col items-start gap-1">
               <div className="flex items-center gap-[2px]">
                 <span className="text-primary font-extrabold text-xl">
-                  Travel
+                  Lekhna
                 </span>
-                <span className="text-accent font-semibold text-xl">Buddy</span>
+                <span className="text-accent font-semibold text-xl">AI</span>
               </div>
               <hr className="w-full border border-base-content" />
               <span className="text-sm text-base-content/70 italic">
-                Find Your Perfect Travel Buddy
+                Build Your Resume with AI
               </span>
             </div>
           </Link>
