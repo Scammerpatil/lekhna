@@ -19,7 +19,7 @@ const UserDashboardPage = () => {
       </h1>
       <div className="flex flex-row flex-wrap gap-4 items-center justify-center">
         <DashboardCard
-          title="Find Travel Buddies"
+          title="Lekhana Matches"
           icon={<IconUsers />}
           path="/user/matches"
         />

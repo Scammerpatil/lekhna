@@ -5,36 +5,46 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  age: number;
-  gender: string;
   phone: string;
-  location?: {
-    type: "Point";
-    coordinates: [number, number];
-  };
-  address: {
-    street: string;
-    district: string;
-    taluka: string;
-    state: string;
-    country: string;
-  };
-  languages?: string[];
   profileImage?: string;
-  bio?: string;
-  destinations?: string[];
-  travelDates?: {
-    start: Date;
-    end: Date;
-  };
-  budget?: string;
-  travelStyle?: string;
-  interests?: string[];
-  preferredCompanion?: string;
-  isVerified?: boolean;
-  emergencyContact?: {
+  summary?: string;
+  skills: string[];
+  experience: {
+    company: string;
+    role: string;
+    location?: string;
+    startDate: Date;
+    endDate?: Date;
+    description?: string;
+  }[];
+  education: {
+    institution: string;
+    degree: string;
+    location?: string;
+    startDate: Date;
+    endDate?: Date;
+  }[];
+  certifications: {
     name: string;
-    phone: string;
-    relationship: string;
+    issuedBy: string;
+    date: Date;
+  }[];
+  projects: {
+    title: string;
+    description: string;
+    technologies: string[];
+    links?: {
+      github?: string;
+      liveDemo?: string;
+    };
+  }[];
+  atsScore?: number;
+  socialLinks?: {
+    linkedin?: string;
+    github?: string;
+    twitter?: string;
+    portfolio?: string;
   };
+  achievements?: string[];
+  
 }

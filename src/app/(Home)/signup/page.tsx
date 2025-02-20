@@ -15,11 +15,6 @@ const SignUp = () => {
     password: "",
     profileImage: "",
     otp: "",
-    gender: "",
-    location: {
-      type: "Point",
-      coordinates: [0, 0],
-    },
   });
   const router = useRouter();
 
@@ -29,53 +24,27 @@ const SignUp = () => {
       !formData.email ||
       !formData.phone ||
       !formData.password ||
-      !formData.profileImage ||
-      !formData.gender
+      !formData.profileImage 
     ) {
       toast.error("Please fill all the fields");
       return;
     }
 
-    if (!navigator.geolocation) {
-      toast.error("Geolocation is not supported by your browser.");
-      return;
+    try {
+      const response = axios.post("/api/auth/signup", { formData });
+      toast.promise(response, {
+        loading: "Creating Account...",
+        success: () => {
+          router.push("/login");
+          return "Account Created Successfully";
+        },
+        error: (err: unknown) => err.response?.data?.message || "Error creating account",
+      });
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast.error("Failed to create account");
     }
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const updatedFormData = {
-          ...formData,
-          location: {
-            type: "Point",
-            coordinates: [position.coords.latitude, position.coords.longitude],
-          },
-        };
-        setFormData(updatedFormData);
-        try {
-          const response = axios.post("/api/auth/signup", { formData });
-          toast.promise(response, {
-            loading: "Creating Account",
-            success: () => {
-              router.push("/login");
-              return "Account Created Successfully";
-            },
-            error: (err: unknown) => {
-              console.log(err);
-              return err.response?.data?.message || "Error creating account";
-            },
-          });
-        } catch (error) {
-          console.error("Signup error:", error);
-          toast.error("Failed to create account");
-        }
-      },
-      (error) => {
-        toast.error(
-          "Unable to retrieve location. Please allow location access."
-        );
-        console.error("Geolocation error:", error);
-      }
-    );
   };
 
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -177,21 +146,7 @@ const SignUp = () => {
                   Verify Email
                 </button>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 text-base-content">
-                <select
-                  className="input input-bordered input-primary w-full text-base-content placeholder:text-base-content/70"
-                  value={formData.gender}
-                  onChange={(e) => {
-                    setFormData({ ...formData, gender: e.target.value });
-                  }}
-                >
-                  <option value="" disabled>
-                    Select Your Gender
-                  </option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
+              <div className="flex flex-col sm:flex-row gap-3 text-base-content">            
                 <input
                   type="text"
                   placeholder="Enter Your Contact No"
@@ -278,7 +233,7 @@ const SignUp = () => {
             }}
           />
           <button
-            className="btn btn-primary w-full"
+            className="btn mt-3 btn-primary w-full"
             onClick={(e) => {
               if (otp === formData.otp) {
                 setEmailVerified(true);

@@ -11,6 +11,7 @@ import {
   IconCamper,
   IconChevronDown,
   IconChevronRight,
+  IconFileText,
   IconMenu,
 } from "@tabler/icons-react";
 import { useUser } from "@/context/UserContext";
@@ -135,12 +136,11 @@ const SideNav = ({ children }: { children: React.ReactNode }) => {
               className="flex h-16 w-full flex-row items-center justify-center space-x-3 border-b border-base-content md:justify-start md:px-6"
             >
               <span className="h-7 w-7 rounded-lg bg-base-200">
-                <IconCamper size={28} className="text-base-content" />
+                <IconFileText size={30} className="text-base-content" />
               </span>
               <span className="text-xl font-bold text-base-content">
                 <h1 className="text-xl font-bold">
-                  <span className="text-primary">Travel</span>
-                  <span className="text-secondary">Finder</span>
+                  <span className="text-primary">Lekhna</span>
                 </h1>
               </span>
             </Link>

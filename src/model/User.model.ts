@@ -4,12 +4,14 @@ export interface IUser extends Document {
     name: string;
     email: string;
     password: string;
+    phone: string;
     profileImage?: string;
     summary?: string;
     skills: string[];
     experience: {
         company: string;
         role: string;
+        location?: string;
         startDate: Date;
         endDate?: Date;
         description?: string;
@@ -17,6 +19,7 @@ export interface IUser extends Document {
     education: {
         institution: string;
         degree: string;
+        location?: string;
         startDate: Date;
         endDate?: Date;
     }[];
@@ -29,6 +32,10 @@ export interface IUser extends Document {
         title: string;
         description: string;
         technologies: string[];
+        links?: {
+            github?: string;
+            liveDemo?: string;
+        };
     }[];
     atsScore?: number;
     socialLinks?: {
@@ -45,6 +52,7 @@ const UserSchema: Schema = new Schema(
         name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
+        phone:  { type: String, required: true },
         profileImage: {
             type: String,
             default:
@@ -56,6 +64,7 @@ const UserSchema: Schema = new Schema(
             {
                 company: { type: String, required: true },
                 role: { type: String, required: true },
+                location: { type: String },
                 startDate: { type: Date, required: true },
                 endDate: { type: Date },
                 description: { type: String },
@@ -65,6 +74,7 @@ const UserSchema: Schema = new Schema(
             {
                 institution: { type: String, required: true },
                 degree: { type: String, required: true },
+                location: { type: String },
                 startDate: { type: Date, required: true },
                 endDate: { type: Date },
             },
@@ -81,6 +91,10 @@ const UserSchema: Schema = new Schema(
                 title: { type: String, required: true },
                 description: { type: String, required: true },
                 technologies: [{ type: String, required: true }],
+                links: {
+                    github: { type: String },
+                    liveDemo: { type: String },
+                },
             },
         ],
         atsScore: { type: Number, default: 0 },

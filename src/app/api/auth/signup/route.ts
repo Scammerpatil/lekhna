@@ -13,8 +13,7 @@ export async function POST(req: NextRequest) {
       !formData.email ||
       !formData.phone ||
       !formData.password ||
-      !formData.profileImage ||
-      !formData.gender
+      !formData.profileImage
     ) {
       return NextResponse.json(
         { message: "Please provide all the required fields" },
