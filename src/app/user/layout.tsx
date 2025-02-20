@@ -1,10 +1,22 @@
 "use client";
 import "../globals.css";
-import Header from "@/Components/Header";
 import { Toaster } from "react-hot-toast";
-import { UserProvider } from "@/context/UserContext";
+import { UserProvider, useUser } from "@/context/UserContext";
+import SideNav from "./SideNav";
+import { useEffect } from "react";
+import axios from "axios";
 
 const Component = ({ children }: { children: React.ReactNode }) => {
+  const { setUser } = useUser();
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await axios.get("/api/auth/verifytoken");
+      if (response.data) {
+        setUser(response.data.user);
+      }
+    };
+    fetchUser();
+  }, []);
   return (
     <html lang="en">
       <head>
@@ -16,9 +28,8 @@ const Component = ({ children }: { children: React.ReactNode }) => {
         />
       </head>
       <body className={`antialiased`}>
-        <Header />
         <Toaster />
-        {children}
+        <SideNav>{children}</SideNav>
       </body>
     </html>
   );
