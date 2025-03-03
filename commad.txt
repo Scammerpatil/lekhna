@@ -1,0 +1,84 @@
+py -3.12 python/run.py python/uploads/Saurav_Patil_V4_MERN_Stack_Developer.pdf "ReactJS Developer Job Brief
+We are looking to hire an experienced ReactJS developer for our skilled front-end development team immediately. As a ReactJS Developer, you will be responsible for designing and building interactive design elements for our software applications.
+
+To be successful in this role, you should be proficient in React.js and the standard tools in its ecosystems, such as Node.js, Yarn, npm, Storybook, and others. Besides, you should be able to redesign the user interface components to improve the application performance.
+
+If you are passionate about building modern user interfaces that redefine user experiences, you are the right candidate for this role. Send in your applications today.
+
+ReactJS Developer Responsibilities
+Understand the application's UI requirements by brainstorming and discussing with the development team.
+
+Support the front-end development team in designing system architecture.
+
+Develop modern user interface elements using react concepts.
+
+Write reusable code to build simple yet intuitive designs in react.js.
+
+Configure and install server environments for front-end deployments.
+
+Monitor and manage the front-end performance to ensure bug-free operations.
+
+Test the front-end system for bugs and errors.
+
+Maintain and manage detailed documentation for front-end modules of the application.
+
+Keep track of the latest developments and trends in the software development industry.
+
+ReactJS Developer Requirements
+X years of experience working as a ReactJS Developer.
+
+Outstanding knowledge of React.js, its core principles, and popular workflows.
+
+Excellent knowledge of front-end programming languages, such as HTML, CSS, and JavaScript.
+
+Ability to translate wireframes and UI designs into comprehensible code.
+
+Good understanding of object-oriented programming along with design patterns and data structures.
+
+Know-how of RESTful APIs is a must.
+
+Basic understanding of code versioning tools, like GIT, SVN, or others.
+
+Bachelor's degree in software engineering, computer science, or related fields.
+
+A team player with excellent communication skills.
+
+Excellent analytical, logical, and designing skills.
+
+Ability to manage multiple projects.
+
+Good time management skills."
+
+import { NextRequest, NextResponse } from "next/server";
+import fs from "fs";
+import { exec } from "child_process";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
+
+export async function POST(req: NextRequest) {
+  const formData = await req.formData();
+  const resumeFile = formData.get("resumeFile") as File;
+  var jobDescription = formData.get("jobDescription") as string;
+  jobDescription = jobDescription.replace(/"/g, '\\"');
+  jobDescription = jobDescription.replace(/\n/g, " ");
+  jobDescription = jobDescription.replace(/\r/g, " ");
+  jobDescription = jobDescription.replace(/\t/g, " ");
+  if (!jobDescription || !resumeFile) {
+    return NextResponse.json(
+      { message: "Please enter a job description and upload a resume." },
+      { status: 400 }
+    );
+  }
+  const filePath = `python/uploads/${resumeFile.name}`;
+  fs.writeFileSync(filePath, Buffer.from(await resumeFile.arrayBuffer()));
+  const pythonScriptPath = "python/run.py";
+  const command = `py -3.12 ${pythonScriptPath} ${filePath} "${jobDescription}"`;
+  console.log(command);
+  const { stdout, stderr } = await execAsync(command);
+  if (stderr) {
+    console.error("Error:", stderr);
+  }
+  console.log("stdout:", JSON.parse(stdout));
+  return NextResponse.json({ result: JSON.parse(stdout) });
+}
