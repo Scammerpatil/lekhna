@@ -1,104 +1,67 @@
-import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
-import { readPdfText } from "pdf-text-reader";
-
-const OLLAMA_API_URL = "http://localhost:11434/api/generate";
-
-async function queryOllama(prompt: string): Promise<string> {
-  const response = await fetch(OLLAMA_API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "llama3", prompt }),
-  });
-
-  const data = await response.json();
-  return data.response || "No response from LLaMA.";
-}
-
-const extractTextFromPDF = async (filePath: string) => {
-  if (!fs.existsSync(filePath)) {
-    return Promise.reject(new Error("File not found"));
-  }
-  const pdfText: string = await readPdfText({ url: filePath });
-  console.info(pdfText);
-};
+import { NextRequest, NextResponse } from "next/server";
+import { PdfReader } from "pdfreader";
+import ollama from "ollama";
 
 export async function POST(req: NextRequest) {
+  const formData = await req.formData();
   try {
-    const formData = await req.formData();
     const resumeFile = formData.get("resumeFile") as File;
     let jobDescription = formData.get("jobDescription") as string;
-
-    if (!jobDescription || !resumeFile) {
-      return NextResponse.json(
-        { message: "Please enter a job description and upload a resume." },
-        { status: 400 }
-      );
-    }
-
     jobDescription = jobDescription.replace(/["\n\r\t]+/g, " ").trim();
-    const resumeBuffer = Buffer.from(await resumeFile.arrayBuffer());
-    fs.writeFileSync("./resume.pdf", resumeBuffer);
-    const resumeText = await extractTextFromPDF("./resume.pdf");
-    console.log("Resume Text:", resumeText);
-
-    if (!resumeText) {
-      return NextResponse.json(
-        { message: "Failed to extract text from resume." },
-        { status: 400 }
-      );
-    }
-
-    const inputPrompt1 = `
-      You are a skilled ATS scanner with expertise in tech roles such as Data Science, Full Stack, Web Development, DevOps, Big Data Engineering, and Data Analysis.
-      Your task is to evaluate the resume against the provided job description. Provide a percentage match and list missing keywords.
-
-      Job Description: ${jobDescription}
-      Resume Text: ${resumeText.substring(0, 500)}...
-
-      Output Format:
-      Percentage Match: "%"
-      Missing Keywords: []
-    `;
-
-    const inputPrompt2 = `
-      You are an experienced HR with tech expertise in roles like Data Science, Full Stack, Web Development, DevOps, Big Data Engineering, and Data Analysis.
-      Evaluate the resume against the job description, highlight strengths, weaknesses, and provide suggestions.
-
-      Job Description: ${jobDescription}
-      Resume Text: ${resumeText.substring(0, 500)}...
-    `;
-
-    // Query LLaMA
-    const matchResult = await queryOllama(inputPrompt1);
-    const improvementSuggestions = await queryOllama(inputPrompt2);
-
-    // Extract percentage match & missing keywords from matchResult
-    const percentageMatchMatch = matchResult.match(/Percentage Match: (\d+)%/);
-    const missingKeywordsMatch = matchResult.match(
-      /Missing Keywords: \[(.*?)\]/
-    );
-
-    const matchPercentage = percentageMatchMatch
-      ? parseInt(percentageMatchMatch[1], 10)
-      : 0;
-    const missingKeywords = missingKeywordsMatch
-      ? missingKeywordsMatch[1].split(/,\s*/).map((kw) => kw.trim())
-      : [];
-
-    // Response structure
-    const response = {
-      matchPercentage,
-      missingKeywords,
-      improvementSuggestions: improvementSuggestions.split("\n"),
-      resumeStrengths: ["Strong technical background", "Relevant experience"], // Example placeholders
+    const resumeBuffer = await resumeFile.arrayBuffer();
+    const buffer = Buffer.from(resumeBuffer);
+    fs.writeFileSync("resume.pdf", buffer);
+    const extractTextFromPDF = (filePath: string): Promise<string> => {
+      return new Promise((resolve, reject) => {
+        let text = "";
+        new PdfReader().parseFileItems(filePath, (err, item) => {
+          if (err) {
+            reject(err);
+          } else if (!item) {
+            resolve(text);
+          } else if (item.text) {
+            text += item.text + " ";
+          }
+        });
+      });
     };
-    console.log(response);
-    return NextResponse.json({ result: response });
+    const resumeText = await extractTextFromPDF("resume.pdf");
+    const inputPrompt = `
+    You are a skilled ATS scanner with expertise in tech roles such as Data Science, Full Stack, Web Development, DevOps, Big Data Engineering, and Data Analysis.
+    Your task is to evaluate the resume against the provided job description. Provide a percentage match and list missing keywords. Also evaluate the resume for strengths and weaknesses and provide suggestions.
+
+    Job Description: ${jobDescription}
+    Resume Text: ${resumeText.substring(0, 500)}...
+
+    Output Format:
+    Percentage Match: "%"
+    Missing Keywords: []
+    Strengths: []
+    Weaknesses: []
+    Suggestions: ""
+
+    Example:
+    Percentage Match: 75%
+    Missing Keywords: ["Python", "SQL"]
+    Strengths: ["Strong technical background", "Relevant experience"]
+    Weaknesses: ["Lack of experience with SQL"]
+    Suggestions: "Consider adding more projects to showcase your skills in SQL."
+  `;
+    const response = await ollama.chat({
+      model: "llama3",
+      messages: [
+        {
+          role: "user",
+          content: inputPrompt,
+        },
+      ],
+    });
+    return NextResponse.json({ result: response.message.content });
   } catch (error) {
-    console.error("Error processing resume:", error);
+    console.error("Error:", error);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { error: "An error occurred while analyzing the resume." },
       { status: 500 }
     );
   }

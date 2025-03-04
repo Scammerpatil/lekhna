@@ -3,23 +3,12 @@ import { IconUpload } from "@tabler/icons-react";
 import axios from "axios";
 import { useState } from "react";
 import toast from "react-hot-toast";
-
-interface Result {
-  matchPercentage: number;
-  missingKeywords: string[];
-  resumeStrengths: string[];
-  improvementSuggestions: string[];
-}
+import ReactMarkdown from "react-markdown";
 
 const JDMatchPage = () => {
   const [jobDescription, setJobDescription] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<Result>({
-    improvementSuggestions: [],
-    matchPercentage: 0,
-    missingKeywords: [],
-    resumeStrengths: [],
-  });
+  const [analysisResult, setAnalysisResult] = useState("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -33,10 +22,10 @@ const JDMatchPage = () => {
       return;
     }
     try {
-      const response = axios.postForm("/api/user/jd-match", {
-        resumeFile,
-        jobDescription,
-      });
+      const formData = new FormData();
+      formData.append("resumeFile", resumeFile);
+      formData.append("jobDescription", jobDescription);
+      const response = axios.post("/api/user/jd-match", formData);
       toast.promise(response, {
         loading: "Analyzing your resume...",
         success: (data) => {
@@ -81,31 +70,9 @@ const JDMatchPage = () => {
       </button>
 
       {analysisResult && (
-        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-          <h2 className="text-xl font-semibold mb-2">Analysis Result</h2>
-          <p>
-            <strong>Match Percentage:</strong> {analysisResult.matchPercentage}%
-          </p>
-          <p>
-            <strong>Missing Keywords:</strong>{" "}
-            {analysisResult.missingKeywords.join(", ") || "None"}
-          </p>
-          <p>
-            <strong>Resume Strengths:</strong>
-          </p>
-          <ul className="list-disc ml-6">
-            {analysisResult.resumeStrengths.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
-          <p>
-            <strong>Improvement Suggestions:</strong>
-          </p>
-          <ul className="list-disc ml-6">
-            {analysisResult.improvementSuggestions.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
-          </ul>
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold">Analysis Result</h2>
+          <ReactMarkdown>{analysisResult}</ReactMarkdown>
         </div>
       )}
     </>
