@@ -23,8 +23,7 @@ const SignUp = () => {
       !formData.name ||
       !formData.email ||
       !formData.phone ||
-      !formData.password ||
-      !formData.profileImage 
+      !formData.password
     ) {
       toast.error("Please fill all the fields");
       return;
@@ -38,36 +37,15 @@ const SignUp = () => {
           router.push("/login");
           return "Account Created Successfully";
         },
-        error: (err: unknown) => err.response?.data?.message || "Error creating account",
+        error: (err: unknown) =>
+          err.response?.data?.message || "Error creating account",
       });
     } catch (error) {
       console.error("Signup error:", error);
       toast.error("Failed to create account");
     }
-
   };
 
-  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size exceeds 5MB");
-        return;
-      }
-      const imageResponse = axios.postForm("/api/helper/upload-img", { file });
-      toast.promise(imageResponse, {
-        loading: "Uploading Image...",
-        success: (data: AxiosResponse) => {
-          setFormData({
-            ...formData,
-            profileImage: data.data.data.url,
-          });
-          return "Image Uploaded Successfully";
-        },
-        error: (err: unknown) => `This just happened: ${err}`,
-      });
-    }
-  };
   const verifyEmail = async () => {
     if (
       !formData.email ||
@@ -127,6 +105,7 @@ const SignUp = () => {
                 <input
                   type="email"
                   placeholder="Enter Your Email"
+                  id="email"
                   className="input input-bordered input-primary w-full text-base-content placeholder:text-base-content/70"
                   value={formData.email}
                   onChange={(e) => {
@@ -146,10 +125,13 @@ const SignUp = () => {
                   Verify Email
                 </button>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 text-base-content">            
+              <div className="flex flex-col sm:flex-row gap-3 text-base-content">
                 <input
                   type="text"
                   placeholder="Enter Your Contact No"
+                  id="phone"
+                  minLength={10}
+                  maxLength={10}
                   className="input input-bordered input-primary w-full text-base-content placeholder:text-base-content/70"
                   value={formData.phone}
                   onChange={(e) => {
@@ -157,12 +139,6 @@ const SignUp = () => {
                   }}
                 />
               </div>
-              <input
-                type="file"
-                className="file-input file-input-bordered w-full text-base-content"
-                accept="image/* .png .jpeg .jpg"
-                onChange={handleProfileImageChange}
-              />
               <input
                 type="Password"
                 placeholder="Enter Your Password"

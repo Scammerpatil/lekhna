@@ -36,19 +36,4 @@ export const SIDENAV_ITEMS: SideNavItem[] = [
     path: "/user/jd-match",
     icon: <IconSearch width="24" height="24" />,
   },
-  {
-    title: "ATS Score",
-    path: "/user/ats-score",
-    icon: <IconChartBar width="24" height="24" />,
-  },
-  {
-    title: "Settings",
-    path: "/user/settings",
-    icon: <IconSettings width="24" height="24" />,
-  },
-  {
-    title: "Support",
-    path: "/user/support",
-    icon: <IconHelpCircle width="24" height="24" />,
-  },
 ];

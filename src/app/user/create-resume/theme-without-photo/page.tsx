@@ -9,10 +9,9 @@ import {
   IconPhone,
   IconSitemap,
 } from "@tabler/icons-react";
-import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
-const CreateResumeWithTheme = () => {
+const CreateResumeWithThemeNoPhoto = () => {
   const { user } = useUser();
   const searchParams = useSearchParams();
   const theme = searchParams.get("id");
@@ -37,11 +36,6 @@ const CreateResumeWithTheme = () => {
         <div className="flex flex-row">
           {/* Left Panel */}
           <div className="w-5/12 bg-base-300 flex flex-col items-center p-4 h-[100vh]">
-            <img
-              src={user?.profileImage}
-              alt="Profile"
-              className="h-[100px] w-[100px] rounded-full mb-4 object-cover"
-            />
             <div className="w-full flex flex-col gap-4">
               <div>
                 <h2 className="text-lg font-semibold border-b border-base-content pb-1">
@@ -101,6 +95,7 @@ const CreateResumeWithTheme = () => {
                   </p>
                 )}
               </div>
+
               <div>
                 <h2 className="text-lg font-semibold border-b border-base-content pb-1">
                   SKILLS
@@ -114,6 +109,7 @@ const CreateResumeWithTheme = () => {
                   </span>
                 ))}
               </div>
+
               <div>
                 <h2 className="text-lg font-semibold border-b border-base-content pb-1">
                   EDUCATION
@@ -125,12 +121,15 @@ const CreateResumeWithTheme = () => {
                     {edu.degree}
                     <br />
                     {new Date(edu.startDate).toLocaleDateString()} -{" "}
-                    {new Date(edu.endDate!).toLocaleDateString() || "Present"}
+                    {edu.endDate
+                      ? new Date(edu.endDate).toLocaleDateString()
+                      : "Present"}
                   </p>
                 ))}
               </div>
             </div>
           </div>
+
           {/* Right Panel */}
           <div className="w-7/12 bg-base-100 p-6">
             <h1 className="uppercase text-3xl font-bold text-base-content">
@@ -139,6 +138,7 @@ const CreateResumeWithTheme = () => {
             <h3 className="mt-2 text-xl text-base-content/80">
               Software Engineer
             </h3>
+
             <h2 className="mt-4 text-2xl font-bold text-base-content border-b border-base-content">
               About Me
             </h2>
@@ -146,6 +146,7 @@ const CreateResumeWithTheme = () => {
               {user?.summary ||
                 "An experienced software developer with expertise in modern web technologies."}
             </p>
+
             <h2 className="mt-4 text-2xl font-bold border-b border-base-content">
               Experience
             </h2>
@@ -156,11 +157,14 @@ const CreateResumeWithTheme = () => {
                 </h3>
                 <p className="text-sm text-base-content/60">
                   {new Date(exp.startDate).toLocaleDateString()} -{" "}
-                  {new Date(exp.endDate!).toLocaleDateString() || "Present"}
+                  {exp.endDate
+                    ? new Date(exp.endDate).toLocaleDateString()
+                    : "Present"}
                 </p>
-                <p className="text-sm">{exp.description!}</p>
+                <p className="text-sm">{exp.description}</p>
               </div>
             ))}
+
             <h2 className="mt-4 text-2xl font-bold border-b border-base-content">
               Projects
             </h2>
@@ -168,19 +172,24 @@ const CreateResumeWithTheme = () => {
               <div key={index} className="mt-2">
                 <h3 className="text-lg font-semibold flex items-center justify-between">
                   {project.title}
-                  {project.links?.github && (
-                    <a href={project.links.github} className="btn btn-primary">
-                      <IconBrandGithub size={18} />
-                    </a>
-                  )}
-                  {project.links?.liveDemo && (
-                    <a
-                      href={project.links.liveDemo}
-                      className="btn btn-secondary"
-                    >
-                      <IconLink size={18} />
-                    </a>
-                  )}
+                  <span className="flex gap-2">
+                    {project.links?.github && (
+                      <a
+                        href={project.links.github}
+                        className="btn btn-primary"
+                      >
+                        <IconBrandGithub size={18} />
+                      </a>
+                    )}
+                    {project.links?.liveDemo && (
+                      <a
+                        href={project.links.liveDemo}
+                        className="btn btn-secondary"
+                      >
+                        <IconLink size={18} />
+                      </a>
+                    )}
+                  </span>
                 </h3>
                 <p className="text-sm">{project.description}</p>
                 <p className="text-sm italic">
@@ -188,13 +197,14 @@ const CreateResumeWithTheme = () => {
                 </p>
               </div>
             ))}
+
             <h2 className="mt-4 text-2xl font-bold border-b border-base-content">
-              Achivements
+              Achievements
             </h2>
             {user?.achievements?.length! > 0 && (
               <div className="mt-2">
                 <ul className="list-disc ml-5 text-base-content text-sm">
-                  {user?.achievements!.map((achieve, index) => (
+                  {user?.achievements?.map((achieve, index) => (
                     <li key={index}>{achieve}</li>
                   ))}
                 </ul>
@@ -203,6 +213,7 @@ const CreateResumeWithTheme = () => {
           </div>
         </div>
       </div>
+
       <div className="text-center mt-6">
         <button onClick={handlePrint} className="btn btn-primary btn-outline">
           Print Resume
@@ -211,4 +222,5 @@ const CreateResumeWithTheme = () => {
     </>
   );
 };
-export default CreateResumeWithTheme;
+
+export default CreateResumeWithThemeNoPhoto;

@@ -12,8 +12,7 @@ export async function POST(req: NextRequest) {
       !formData.name ||
       !formData.email ||
       !formData.phone ||
-      !formData.password ||
-      !formData.profileImage
+      !formData.password
     ) {
       return NextResponse.json(
         { message: "Please provide all the required fields" },
@@ -40,6 +39,7 @@ export async function POST(req: NextRequest) {
     const hashedPassword = bcrypt.hashSync(formData.password, 10);
     const newUser = new User({
       ...formData,
+      profileImage: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
       password: hashedPassword,
       isVerified: true,
     });

@@ -68,8 +68,7 @@ const UserSchema: Schema = new Schema(
     },
     profileImage: {
       type: String,
-      default:
-        "https://res.cloudinary.com/du8msdgbj/image/upload/v1631440717/avatars/avatar-1_rine9f.png",
+      default: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
     },
     summary: {
       type: String,
